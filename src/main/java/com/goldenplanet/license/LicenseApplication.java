@@ -1,13 +1,11 @@
-package com.goldenplanet.licenseKeyAuth;
+package com.goldenplanet.license;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LicenseKeyAuthApplication {
-
+public class LicenseApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(LicenseKeyAuthApplication.class, args);
+		SpringApplication.run(LicenseApplication.class, args);
 	}
-
 }

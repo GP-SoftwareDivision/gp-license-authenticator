@@ -1,4 +1,4 @@
-package com.goldenplanet.licenseKeyAuth;
+package com.goldenplanet.license;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
