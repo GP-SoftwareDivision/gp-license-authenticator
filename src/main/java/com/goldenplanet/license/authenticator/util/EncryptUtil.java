@@ -13,45 +13,44 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
+import com.goldenplanet.license.authenticator.advice.exception.InvalidLicenseException;
+
 @Component
 public class EncryptUtil {
-	private SecretKey secretKey;
 	@Value("${secret.mode}")
 	private String mode;
+	@Value("${secret.algorithm}")
+	private String algorithm;
+	@Value("${secret.key-file-path}")
+	private String keyFilePath;
 
-	public EncryptUtil(@Value("${secret.algorithm}") String algorithm,
-		@Value("${secret.key-file-path}") String keyFilePath) {
+	public SecretKey getSecretKey() {
 		try {
 			Path path = new ClassPathResource(keyFilePath).getFile().toPath();
 			byte[] keyBytes = Files.readAllBytes(path);
-			this.secretKey = new SecretKeySpec(keyBytes, algorithm);
+			return decodeBase64ToSecretKey(new String(keyBytes));
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load key file.", e);
 		}
 	}
 
-	public String encrypt(String data) {
-		try {
-			Cipher cipher = Cipher.getInstance(mode);
-			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-			byte[] encrypted = cipher.doFinal(data.getBytes());
-			return Base64.getEncoder().encodeToString(encrypted);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+	public SecretKey decodeBase64ToSecretKey(String base64Key) {
+		// Decode the Base64 string to bytes
+		byte[] decodedKey = Base64.getDecoder().decode(base64Key);
+		// Reconstruct the key using SecretKeySpec
+		return new SecretKeySpec(decodedKey, 0, decodedKey.length, algorithm);
 	}
 
 	public String decrypt(String encryptedData) {
 		try {
 			Cipher cipher = Cipher.getInstance(mode);
-			cipher.init(Cipher.DECRYPT_MODE, secretKey);
+			cipher.init(Cipher.DECRYPT_MODE, getSecretKey());
 			byte[] decodedData = Base64.getDecoder().decode(encryptedData);
 			byte[] decrypted = cipher.doFinal(decodedData);
 			return new String(decrypted);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+			throw new InvalidLicenseException(e.getMessage());
 		}
 	}
+
 }
