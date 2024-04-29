@@ -31,5 +31,6 @@ public class LicenseJpaEntity {
 	private String macAddress;
 	private String licenseKey;
 	private String secretKey;
+	private String licenseType;
 
 }

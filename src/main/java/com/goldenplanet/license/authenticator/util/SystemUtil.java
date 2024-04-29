@@ -8,6 +8,9 @@ import java.util.Enumeration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.goldenplanet.license.authenticator.advice.exception.ErrorCode;
+import com.goldenplanet.license.authenticator.advice.exception.MacAddressCannotReadException;
+
 @Component
 public class SystemUtil {
 	@Value("${secret.solutionId}")
@@ -33,8 +36,7 @@ public class SystemUtil {
 			}
 			return false;
 		} catch (SocketException e) {
-			e.printStackTrace();
+			throw new MacAddressCannotReadException(ErrorCode.MAC_ADDRESS_CANNOT_READ.getErrorMessage());
 		}
-		throw new RuntimeException();
 	}
 }

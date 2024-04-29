@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.goldenplanet.license.authenticator.advice.exception.ErrorCode;
+import com.goldenplanet.license.authenticator.advice.exception.InvalidLicenseException;
 import com.goldenplanet.license.authenticator.dto.LicenseAuthenticationRequest;
 import com.goldenplanet.license.authenticator.util.EncryptUtil;
 import com.goldenplanet.license.authenticator.util.SystemUtil;
@@ -35,7 +37,8 @@ public class AuthServiceTest {
 			{
 			    "solutionId": "solution123",
 			    "licenseExpiredDt": "%s",
-			    "macAddress": "00-14-22-01-23-46"
+			    "macAddress": "00-14-22-01-23-46",
+			    "licenseType": "운영"
 			}
 			""".formatted(LocalDate.now().plusDays(1).toString());
 		LicenseAuthenticationRequest request = new LicenseAuthenticationRequest(encryptedKey);
@@ -55,6 +58,34 @@ public class AuthServiceTest {
 	}
 
 	@Test
+	void checkLicenseKey_LicenseTypeIsDev_True() {
+		// Given
+		String encryptedKey = "validEncryptedLicenseKey";
+		String decryptedData = """
+			{
+			    "solutionId": "solution123",
+			    "licenseExpiredDt": "%s",
+			    "macAddress": "00-14-22-01-23-46",
+			    "licenseType": "임시"
+			}
+			""".formatted(LocalDate.now().plusDays(1).toString());
+		LicenseAuthenticationRequest request = new LicenseAuthenticationRequest(encryptedKey);
+
+		when(encryptUtil.decrypt(encryptedKey)).thenReturn(decryptedData);
+		when(systemUtil.matchMacAddress(anyString())).thenReturn(false);
+		when(systemUtil.getSolutionId()).thenReturn("solution123");
+
+		// When
+		boolean result = authService.checkLicenseKey(request);
+
+		// Then
+		assertTrue(result);
+		verify(encryptUtil).decrypt(encryptedKey);
+		verify(systemUtil).getSolutionId();
+		verify(systemUtil, times(0)).matchMacAddress(anyString());
+	}
+
+	@Test
 	void checkLicenseKey_MacAddressDoesNotMatch_False() {
 		// Given
 		String encryptedKey = "invalidMacLicenseKey";
@@ -62,16 +93,18 @@ public class AuthServiceTest {
 			{
 			    "solutionId": "solution123",
 			    "licenseExpiredDt": "%s",
-			    "macAddress": "00-14-22-01-23-46"
+			    "macAddress": "00-14-22-01-23-46",
+			    "licenseType": "운영"
 			}
 			""".formatted(LocalDate.now().plusDays(1).toString());
 		LicenseAuthenticationRequest request = new LicenseAuthenticationRequest(encryptedKey);
 
+		when(systemUtil.getSolutionId()).thenReturn("solution123");
 		when(encryptUtil.decrypt(encryptedKey)).thenReturn(decryptedData);
 		when(systemUtil.matchMacAddress("00-14-22-01-23-46")).thenReturn(false);
 
 		// When & Then(throws)
-		Exception exception = assertThrows(RuntimeException.class, () -> authService.checkLicenseKey(request));
+		Exception exception = assertThrows(InvalidLicenseException.class, () -> authService.checkLicenseKey(request));
 		assertEquals(ErrorCode.MAC_ADDRESS_MISMATCH.getErrorMessage(), exception.getMessage());
 	}
 
@@ -83,7 +116,8 @@ public class AuthServiceTest {
 			{
 			    "solutionId": "solution123",
 			    "licenseExpiredDt": "%s",
-			    "macAddress": "00-14-22-01-23-45"
+			    "macAddress": "00-14-22-01-23-45",
+			    "licenseType": "운영"
 			}
 			""".formatted(LocalDate.now().minusDays(1).toString());
 		LicenseAuthenticationRequest request = new LicenseAuthenticationRequest(encryptedKey);
@@ -92,7 +126,7 @@ public class AuthServiceTest {
 		when(encryptUtil.decrypt(encryptedKey)).thenReturn(decryptedData);
 
 		// When & Then(throws)
-		Exception exception = assertThrows(RuntimeException.class, () -> authService.checkLicenseKey(request));
+		Exception exception = assertThrows(InvalidLicenseException.class, () -> authService.checkLicenseKey(request));
 		assertEquals(ErrorCode.EXPIRED.getErrorMessage(), exception.getMessage());
 	}
 
@@ -104,7 +138,8 @@ public class AuthServiceTest {
 			{
 			    "solutionId": "solution999",
 			    "licenseExpiredDt": "%s",
-			    "macAddress": "00-14-22-01-23-45"
+			    "macAddress": "00-14-22-01-23-45",
+			    "licenseType": "운영"
 			}
 			""".formatted(LocalDate.now().plusDays(1).toString());
 		LicenseAuthenticationRequest request = new LicenseAuthenticationRequest(encryptedKey);
@@ -114,7 +149,7 @@ public class AuthServiceTest {
 		when(systemUtil.getSolutionId()).thenReturn("solution123");
 
 		// Act & Assert
-		Exception exception = assertThrows(RuntimeException.class, () -> authService.checkLicenseKey(request));
+		Exception exception = assertThrows(InvalidLicenseException.class, () -> authService.checkLicenseKey(request));
 		assertEquals(ErrorCode.SOLUTION_CODE_MISMATCH.getErrorMessage(), exception.getMessage());
 	}
 

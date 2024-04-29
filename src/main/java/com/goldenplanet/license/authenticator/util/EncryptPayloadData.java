@@ -1,4 +1,4 @@
 package com.goldenplanet.license.authenticator.util;
 
-public record EncryptPayloadData(String solutionId, String licenseExpiredDt, String macAddress) {
+public record EncryptPayloadData(String solutionId, String licenseExpiredDt, String macAddress, String licenseType) {
 }
