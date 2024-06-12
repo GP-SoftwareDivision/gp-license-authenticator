@@ -1,4 +1,4 @@
-package com.goldenplanet.license.authenticator.advice.exception;
+package com.goldenplanet.license.authenticator.exception;
 
 public class MacAddressCannotReadException extends RuntimeException {
 	public MacAddressCannotReadException(String msg) {

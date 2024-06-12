@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.goldenplanet.license.authenticator.advice.exception.InvalidLicenseException;
-import com.goldenplanet.license.authenticator.advice.exception.MacAddressCannotReadException;
+import com.goldenplanet.license.authenticator.exception.InvalidLicenseException;
+import com.goldenplanet.license.authenticator.exception.MacAddressCannotReadException;
 
 @RestControllerAdvice
 public class LicenseExceptionAdvice {

@@ -5,24 +5,21 @@ import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.goldenplanet.license.authenticator.advice.exception.ErrorCode;
-import com.goldenplanet.license.authenticator.advice.exception.MacAddressCannotReadException;
+import com.goldenplanet.license.authenticator.exception.ErrorCode;
+import com.goldenplanet.license.authenticator.exception.MacAddressCannotReadException;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
-public class SystemUtil {
-	@Value("${secret.solutionId}")
-	private String solutionId;
-
-	public String getSolutionId() {
-		return solutionId;
-	}
+@RequiredArgsConstructor
+public class MacAddressMatcher {
+	private final NetworkInterfaceProvider networkInterfaceProvider;
 
 	public boolean matchMacAddress(String macAddress) {
 		try {
-			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+			Enumeration<NetworkInterface> networkInterfaces = networkInterfaceProvider.getNetworkInterfaces();
 			for (NetworkInterface netIf : Collections.list(networkInterfaces)) {
 				byte[] mac = netIf.getHardwareAddress();
 				if (mac != null) {
@@ -30,8 +27,9 @@ public class SystemUtil {
 					for (int i = 0; i < mac.length; i++) {
 						sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
 					}
-					if (macAddress.equals(sb.toString()))
+					if (macAddress.contentEquals(sb)) {
 						return true;
+					}
 				}
 			}
 			return false;

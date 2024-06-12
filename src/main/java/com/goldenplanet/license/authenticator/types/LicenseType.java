@@ -1,5 +1,8 @@
 package com.goldenplanet.license.authenticator.types;
 
+import lombok.Getter;
+
+@Getter
 public enum LicenseType {
 	DEV("임시"),
 	PROD("운영");
@@ -9,7 +12,4 @@ public enum LicenseType {
 		this.description = description;
 	}
 
-	public String getDescription() {
-		return this.description;
-	}
 }
