@@ -8,8 +8,10 @@ import com.goldenplanet.license.authenticator.handler.LicenseHandlerChain;
 import com.goldenplanet.license.authenticator.util.EncryptPayloadDataProcessor;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthService {
 	private final LicenseHandlerChain licenseHandlerChain;

@@ -1,0 +1,15 @@
+server:
+  port: 8000
+spring:
+  application:
+    name: license-authenticator
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+secret:
+  solutionId: 1
+  algorithm: AES
+  key-file-path: secretkey.txt
+  mode: AES/ECB/PKCS5Padding

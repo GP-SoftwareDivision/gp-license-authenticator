@@ -24,7 +24,7 @@ public class DecryptionService {
 			SecretKey secretKey = secretKeyLoader.loadSecretKey();
 			return decryptionStrategy.decrypt(encryptedData, secretKey, secretProperties.getMode());
 		} catch (Exception e) {
-			throw new InvalidLicenseException("Decryption failed due to an internal error");
+			throw new InvalidLicenseException("Decryption failed due to an internal error: " + e.getMessage());
 		}
 	}
 }

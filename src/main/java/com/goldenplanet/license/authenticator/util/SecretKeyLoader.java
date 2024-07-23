@@ -1,14 +1,14 @@
 package com.goldenplanet.license.authenticator.util;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.util.Base64;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import com.goldenplanet.license.authenticator.config.SecretProperties;
@@ -19,13 +19,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecretKeyLoader {
 
-	private final ResourceLoader resourceLoader;
 	private final SecretProperties secretProperties;
 
 	public SecretKey loadSecretKey() {
-		try {
-			Resource resource = resourceLoader.getResource("classpath:" + secretProperties.getKeyFilePath());
-			byte[] keyBytes = Files.readAllBytes(resource.getFile().toPath());
+		Resource resource = new ClassPathResource(secretProperties.getKeyFilePath());
+		try (InputStream inputStream = resource.getInputStream()) {
+			byte[] keyBytes = inputStream.readAllBytes();
 			return decodeBase64ToSecretKey(new String(keyBytes));
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load key file from path: " + secretProperties.getKeyFilePath(), e);
