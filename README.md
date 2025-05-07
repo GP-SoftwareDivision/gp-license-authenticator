@@ -16,7 +16,7 @@ Mac Address 관련 인증이 필요하기 때문에, 컨테이너화를 하지 �
 Cloning the `license-authenticator`
 
 ```shell
-git clone ssh://hongjunlee@goldenplanet.co.kr@source.developers.google.com:2022/p/tousflux/r/license-authenticator
+git clone https://github.com/GP-SoftwareDivision/gp-license-authenticator.git
 ```
 
 ## application.yml 작성
