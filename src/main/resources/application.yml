@@ -9,7 +9,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 secret:
-  solutionId: 1
+  solution-id: 2
   algorithm: AES
   key-file-path: secretkey.txt
   mode: AES/ECB/PKCS5Padding
